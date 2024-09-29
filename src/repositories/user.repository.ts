@@ -5,19 +5,21 @@ class UserRepository {
   public async getList(): Promise<IUser[]> {
     return await User.find({});
   }
-  public async create(dto: Partial<IUser>): Promise<any> {
+  public async create(dto: Partial<IUser>): Promise<IUser> {
     return await User.create(dto);
   }
   public async getById(userId: string): Promise<IUser | null> {
     return await User.findById(userId);
   }
-  public async update(
-    dto: Partial<IUser>,
-    userId: string,
-  ): Promise<IUser | null> {
+
+  public async getByEmail(email: string): Promise<IUser | null> {
+    return await User.findOne({ email }).select("+password");
+  }
+  public async updateById(userId: string, dto: Partial<IUser>): Promise<IUser> {
     return await User.findByIdAndUpdate(userId, dto, { new: true });
   }
-  public async delete(userId: string): Promise<void> {
+
+  public async deleteById(userId: string): Promise<void> {
     await User.deleteOne({ _id: userId });
   }
 }
