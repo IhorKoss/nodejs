@@ -3,12 +3,14 @@ import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api-error";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
 import {
+  IChangePassword,
   IResetPasswordSend,
   IResetPasswordSet,
   ISignIn,
   IUser,
 } from "../interfaces/user.interface";
 import { actionTokenRepository } from "../repositories/action-token.repository";
+import { oldPasswordsRepository } from "../repositories/old-passwords.repository";
 import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
 import { emailService } from "./email.service";
@@ -152,6 +154,40 @@ class AuthService {
       _userId: jwtPayload.userId,
       type: ActionTokenTypeEnum.VERIFY_EMAIL,
     });
+  }
+  public async changePassword(
+    jwtPayload: ITokenPayload,
+    dto: IChangePassword,
+  ): Promise<void> {
+    const [user, oldPasswords] = await Promise.all([
+      userRepository.getById(jwtPayload.userId),
+      oldPasswordsRepository.findByParams(jwtPayload.userId),
+    ]);
+    const isPasswordCorrect = await passwordService.comparePassword(
+      dto.oldPassword,
+      user.password,
+    );
+    if (!isPasswordCorrect) {
+      throw new ApiError("Invalid previous password", 401);
+    }
+
+    const passwords = [...oldPasswords, { password: user.password }];
+    await Promise.all(
+      passwords.map(async (oldPassword) => {
+        const isPrevious = await passwordService.comparePassword(
+          dto.password,
+          oldPassword.password,
+        );
+        if (isPrevious) {
+          throw new ApiError("Password already used", 409);
+        }
+      }),
+    );
+    const password = await passwordService.hashPassword(dto.password);
+    const oldPassword = await passwordService.hashPassword(dto.oldPassword);
+    await userRepository.updateById(jwtPayload.userId, { password });
+    await oldPasswordsRepository.addOldPassword(jwtPayload.userId, oldPassword);
+    await tokenRepository.deleteManyByParams({ _userId: jwtPayload.userId });
   }
 }
 

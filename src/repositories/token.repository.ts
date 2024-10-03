@@ -1,5 +1,6 @@
 import { IToken } from "../interfaces/token.interface";
 import { Token } from "../models/token.model";
+// import {IUser} from "../interfaces/user.interface";
 
 class TokenRepository {
   public async create(dto: Partial<IToken>): Promise<IToken> {
@@ -15,6 +16,17 @@ class TokenRepository {
   }
   public async deleteManyByParams(params: Partial<IToken>): Promise<void> {
     await Token.deleteMany(params);
+  }
+  public async deleteBeforeDate(date: Date): Promise<number> {
+    const { deletedCount } = await Token.deleteMany({
+      createdAt: { $lt: date },
+    });
+    return deletedCount;
+  }
+  public async findUsersBeforeDate(date: Date): Promise<IToken[]> {
+    return await Token.find({
+      createdAt: { $lt: date },
+    });
   }
 }
 
