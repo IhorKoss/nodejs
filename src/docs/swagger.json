@@ -1,0 +1,104 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is swagger doc for March2024 node.js",
+    "version": "hw11",
+    "title": "Swagger Okten Node.js"
+  },
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/auth/sign-in": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Signing in",
+        "description": "",
+        "operationId": "uploadFile",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "formData",
+            "description": "id of user",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "description": "password of user",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "examples": {
+              "application/json":
+              {
+                "user": {
+                  "_id": "66f9a09000f056ab2132372a",
+                  "name": "Ihor",
+                  "age": 20,
+                  "email": "kos.ig.iv@gmail.com",
+                  "password": "$2b$10$grwTU7xG5StUZdiDhJjFdeGMHHCOBd6X2hgym7zd1DYOSfuYEaFku",
+                  "role": "user",
+                  "isVerified": true,
+                  "isDeleted": false,
+                  "createdAt": "2024-09-29T18:46:40.628Z",
+                  "updatedAt": "2024-10-03T16:04:51.318Z",
+                  "avatar": "link"
+                },
+                "tokens": {
+                  "accessToken": "your atoken",
+                  "refreshToken": "your rtoken"
+                }
+              }
+            }
+          }
+        }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Logs out",
+        "description": "",
+        "operationId": "addPet",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Pet object that needs to be added to the store",
+            "required": true
+          }
+        ],
+        "responses": {
+          "405": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    }
+  }
+
